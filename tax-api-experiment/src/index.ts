@@ -8,7 +8,12 @@ app.get('/', (_, res) => {
 });
 
 app.post('/check-post', (_, res) => {
-  res.send('Hello POST!');
+  // res.send('Hello POST!');
+  res.json({ message: 'Hello JSON!' });
+});
+
+app.post('/check-status-code', (_, res) => {
+  res.status(500).json({ message: 'Hello StatusCode!' });
 });
 
 app.listen(port, () => {
