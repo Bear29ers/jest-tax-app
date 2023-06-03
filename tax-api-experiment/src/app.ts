@@ -22,4 +22,20 @@ app.post('/check-body', (req, res) => {
   res.json({ message: 'Hello JSON body!' });
 });
 
+type CalcInput = {
+  yearsOfService: number;
+  isDisability: boolean;
+  isOfficier: boolean;
+  severancePay: number;
+};
+
+const calcTax = (input: CalcInput) => {
+  // TODO: 退職金の所得税を計算する
+  return 10000;
+};
+
+app.post('/calc-tax', (req, res) => {
+  res.json({ tax: calcTax(req.body) });
+});
+
 export default app;
