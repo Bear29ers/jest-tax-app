@@ -125,3 +125,13 @@ export const calcIncomeTaxBase = ({
   }
   return calc(taxableRetirementIncome, 45, 4_796_000);
 };
+
+type CalcTaxWithheldInput = {
+  // 基準所得税額
+  incomeTaxBase: number;
+};
+
+// 所得税の源泉徴収税額
+export const calcTaxWithheld = ({ incomeTaxBase }: CalcTaxWithheldInput) => {
+  return Math.floor((incomeTaxBase * 1021) / 1000);
+};

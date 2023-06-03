@@ -2,6 +2,7 @@ import {
   calcRetirementIncomeDeduction,
   calcTaxableRetirementIncome,
   calcIncomeTaxBase,
+  calcTaxWithheld,
 } from './calcTax';
 
 /*
@@ -279,6 +280,22 @@ describe('基準所得税額', () => {
     '課税退職所得金額$taxableRetirementIncome円 → $expected円',
     ({ taxableRetirementIncome, expected }) => {
       expect(calcIncomeTaxBase({ taxableRetirementIncome })).toBe(expected);
+    },
+  );
+});
+
+// 所得税の源泉徴収税額テスト
+describe('所得税の源泉徴収税額', () => {
+  test.each`
+    incomeTaxBase | expected
+    ${0}          | ${0}
+    ${50}         | ${51}
+    ${120}        | ${122}
+    ${1000}       | ${1021}
+  `(
+    '基準所得税額$incomeTaxBase円 → $expected円',
+    ({ incomeTaxBase, expected }) => {
+      expect(calcTaxWithheld({ incomeTaxBase })).toBe(expected);
     },
   );
 });
