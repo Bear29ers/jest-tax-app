@@ -1,26 +1,3 @@
-type CalcRetirementIncomeDeductionInput = {
-  // 勤続年数
-  yearsOfService: number;
-  // 障害者となったことに直接起因して退職したか
-  isDisability: boolean;
-};
-
-type CalcTaxableRetirementIncomeInput = {
-  // 勤続年数
-  yearsOfService: number;
-  // 役員等かどうか
-  isOfficer: boolean;
-  // 退職金
-  severancePay: number;
-  // 退職所得控除額
-  retirementIncomeDeduction: number;
-};
-
-type CalcIncomeTaxBaseInput = {
-  // 課税退職所得金額
-  taxableRetirementIncome: number;
-};
-
 // 退職所得控除額
 /*
 export const calcRetirementIncomeDeduction = (
@@ -44,6 +21,13 @@ export const calcRetirementIncomeDeduction = (
 };
 */
 
+type CalcRetirementIncomeDeductionInput = {
+  // 勤続年数
+  yearsOfService: number;
+  // 障害者となったことに直接起因して退職したか
+  isDisability: boolean;
+};
+
 // 退職所得控除額（リファクタリング）
 export const calcRetirementIncomeDeduction = ({
   yearsOfService,
@@ -61,6 +45,17 @@ export const calcRetirementIncomeDeduction = ({
   if (isDisability) deduction += 1_000_000;
 
   return deduction;
+};
+
+type CalcTaxableRetirementIncomeInput = {
+  // 勤続年数
+  yearsOfService: number;
+  // 役員等かどうか
+  isOfficer: boolean;
+  // 退職金
+  severancePay: number;
+  // 退職所得控除額
+  retirementIncomeDeduction: number;
 };
 
 // 課税退職所得金額
@@ -92,4 +87,41 @@ export const calcTaxableRetirementIncome = ({
   };
 
   return Math.floor(calc() / 1000) * 1000;
+};
+
+type CalcIncomeTaxBaseInput = {
+  // 課税退職所得金額
+  taxableRetirementIncome: number;
+};
+
+// 基準所得税額
+export const calcIncomeTaxBase = ({
+  taxableRetirementIncome,
+}: CalcIncomeTaxBaseInput) => {
+  if (taxableRetirementIncome === 0) {
+    return 0;
+  }
+
+  const calc = (income: number, taxRate: number, deduction: number) =>
+    (income * taxRate) / 100 - deduction;
+
+  if (taxableRetirementIncome <= 1_949_000) {
+    return calc(taxableRetirementIncome, 5, 0);
+  }
+  if (taxableRetirementIncome <= 3_299_000) {
+    return calc(taxableRetirementIncome, 10, 97_500);
+  }
+  if (taxableRetirementIncome <= 6_949_000) {
+    return calc(taxableRetirementIncome, 20, 427_500);
+  }
+  if (taxableRetirementIncome <= 8_999_000) {
+    return calc(taxableRetirementIncome, 23, 636_000);
+  }
+  if (taxableRetirementIncome <= 17_999_000) {
+    return calc(taxableRetirementIncome, 33, 1_536_000);
+  }
+  if (taxableRetirementIncome <= 39_999_000) {
+    return calc(taxableRetirementIncome, 40, 2_796_000);
+  }
+  return calc(taxableRetirementIncome, 45, 4_796_000);
 };
