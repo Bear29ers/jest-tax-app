@@ -5,6 +5,22 @@ type CalcRetirementIncomeDeductionInput = {
   isDisability: boolean;
 };
 
+type CalcTaxableRetirementIncomeInput = {
+  // 勤続年数
+  yearsOfService: number;
+  // 役員等かどうか
+  isOfficer: boolean;
+  // 退職金
+  severancePay: number;
+  // 退職所得控除額
+  retirementIncomeDeduction: number;
+};
+
+type CalcIncomeTaxBaseInput = {
+  // 課税退職所得金額
+  taxableRetirementIncome: number;
+};
+
 // 退職所得控除額
 /*
 export const calcRetirementIncomeDeduction = (
@@ -45,4 +61,35 @@ export const calcRetirementIncomeDeduction = ({
   if (isDisability) deduction += 1_000_000;
 
   return deduction;
+};
+
+// 課税退職所得金額
+export const calcTaxableRetirementIncome = ({
+  yearsOfService,
+  isOfficer,
+  severancePay,
+  retirementIncomeDeduction,
+}: CalcTaxableRetirementIncomeInput) => {
+  const targetIncome = severancePay - retirementIncomeDeduction;
+  if (targetIncome <= 0) {
+    return 0;
+  }
+
+  const calc = () => {
+    if (yearsOfService >= 6) {
+      return targetIncome / 2;
+    }
+
+    if (isOfficer) {
+      return targetIncome;
+    }
+
+    if (targetIncome > 3_000_000) {
+      return targetIncome - 1_500_000;
+    }
+
+    return targetIncome / 2;
+  };
+
+  return Math.floor(calc() / 1000) * 1000;
 };
