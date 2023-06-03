@@ -135,3 +135,38 @@ type CalcTaxWithheldInput = {
 export const calcTaxWithheld = ({ incomeTaxBase }: CalcTaxWithheldInput) => {
   return Math.floor((incomeTaxBase * 1021) / 1000);
 };
+
+type CalcSeverancePayTaxInput = {
+  // 勤続年数
+  yearsOfService: number;
+  // 障害者となったことに直接起因して退職したか
+  isDisability: boolean;
+  // 役員等かどうか
+  isOfficer: boolean;
+  // 退職金
+  severancePay: number;
+};
+
+// 退職金の所得税
+export const calcIncomeTaxForSeverancePay = ({
+  yearsOfService,
+  isDisability,
+  isOfficer,
+  severancePay,
+}: CalcSeverancePayTaxInput) => {
+  const retirementIncomeDeduction = calcRetirementIncomeDeduction({
+    yearsOfService,
+    isDisability,
+  });
+
+  const taxableRetirementIncome = calcTaxableRetirementIncome({
+    yearsOfService,
+    isOfficer,
+    severancePay,
+    retirementIncomeDeduction,
+  });
+
+  const incomeTaxBase = calcIncomeTaxBase({ taxableRetirementIncome });
+
+  return calcTaxWithheld({ incomeTaxBase });
+};
