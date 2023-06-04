@@ -301,6 +301,7 @@ describe('所得税の源泉徴収税額', () => {
   );
 });
 
+// 退職金所得税テスト
 describe('退職金の所得税', () => {
   test.each`
     yearsOfService | isDisability | isOfficer | severancePay | expected
@@ -325,4 +326,19 @@ describe('退職金の所得税', () => {
       expect(tax).toBe(expected);
     },
   );
+
+  describe('入力値バリデーション', () => {
+    describe('勤続年数は1以上100以下の整数であること', () => {
+      test('勤続年数0年はエラー', () => {
+        expect(() =>
+          calcIncomeTaxForSeverancePay({
+            yearsOfService: 0,
+            isDisability: false,
+            isOfficer: false,
+            severancePay: 100_000_000,
+          }),
+        ).toThrow('Invalid argument.');
+      });
+    });
+  });
 });
