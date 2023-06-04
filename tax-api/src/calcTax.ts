@@ -139,7 +139,7 @@ export const calcTaxWithheld = ({ incomeTaxBase }: CalcTaxWithheldInput) => {
 };
 
 // 入力値のバリデーション
-const CalcSeverancePayTaxInputSchema = z
+export const CalcSeverancePayTaxInputSchema = z
   .object({
     // 勤続年数
     yearsOfService: z.number().int().gte(1).lte(100),
