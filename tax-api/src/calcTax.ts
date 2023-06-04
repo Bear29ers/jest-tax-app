@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 // 退職所得控除額
 /*
 export const calcRetirementIncomeDeduction = (
@@ -134,4 +136,54 @@ type CalcTaxWithheldInput = {
 // 所得税の源泉徴収税額
 export const calcTaxWithheld = ({ incomeTaxBase }: CalcTaxWithheldInput) => {
   return Math.floor((incomeTaxBase * 1021) / 1000);
+};
+
+// 入力値のバリデーション
+const CalcSeverancePayTaxInputSchema = z
+  .object({
+    // 勤続年数
+    yearsOfService: z.number().int().gte(1).lte(100),
+    // 障害者となったことに直接起因して退職したか
+    isDisability: z.boolean(),
+    // 役員等かどうか
+    isOfficer: z.boolean(),
+    // 退職金
+    severancePay: z.number().int().gte(0).lte(1_000_000_000_000),
+  })
+  .strict();
+
+// Zodのスキーマから型推論で型を生成する
+type CalcSeverancePayTaxInput = z.infer<typeof CalcSeverancePayTaxInputSchema>;
+
+// バリデーション関数の抽出
+const validateInput = (input: CalcSeverancePayTaxInput) => {
+  try {
+    return CalcSeverancePayTaxInputSchema.parse(input);
+  } catch (e) {
+    throw new Error('Invalid argument.', { cause: e });
+  }
+};
+
+// 退職金の所得税
+export const calcIncomeTaxForSeverancePay = (
+  input: CalcSeverancePayTaxInput,
+) => {
+  const { yearsOfService, isDisability, isOfficer, severancePay } =
+    validateInput(input);
+
+  const retirementIncomeDeduction = calcRetirementIncomeDeduction({
+    yearsOfService,
+    isDisability,
+  });
+
+  const taxableRetirementIncome = calcTaxableRetirementIncome({
+    yearsOfService,
+    isOfficer,
+    severancePay,
+    retirementIncomeDeduction,
+  });
+
+  const incomeTaxBase = calcIncomeTaxBase({ taxableRetirementIncome });
+
+  return calcTaxWithheld({ incomeTaxBase });
 };
