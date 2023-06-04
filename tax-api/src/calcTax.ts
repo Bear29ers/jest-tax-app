@@ -152,30 +152,24 @@ const CalcSeverancePayTaxInputSchema = z
   })
   .strict();
 
-type CalcSeverancePayTaxInput = {
-  // 勤続年数
-  yearsOfService: number;
-  // 障害者となったことに直接起因して退職したか
-  isDisability: boolean;
-  // 役員等かどうか
-  isOfficer: boolean;
-  // 退職金
-  severancePay: number;
+// Zodのスキーマから型推論で型を生成する
+type CalcSeverancePayTaxInput = z.infer<typeof CalcSeverancePayTaxInputSchema>;
+
+// バリデーション関数の抽出
+const validateInput = (input: CalcSeverancePayTaxInput) => {
+  try {
+    return CalcSeverancePayTaxInputSchema.parse(input);
+  } catch (e) {
+    throw new Error('Invalid argument.', { cause: e });
+  }
 };
 
 // 退職金の所得税
 export const calcIncomeTaxForSeverancePay = (
   input: CalcSeverancePayTaxInput,
 ) => {
-  let validatedInput;
-  try {
-    validatedInput = CalcSeverancePayTaxInputSchema.parse(input);
-  } catch (e) {
-    throw new Error('Invalid argument.', { cause: e });
-  }
-
   const { yearsOfService, isDisability, isOfficer, severancePay } =
-    validatedInput;
+    validateInput(input);
 
   const retirementIncomeDeduction = calcRetirementIncomeDeduction({
     yearsOfService,
