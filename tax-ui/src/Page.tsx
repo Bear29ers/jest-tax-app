@@ -15,7 +15,7 @@ export const Presentation = ({ tax }: PresentationProps) => (
     <HStack w="100%">
       <Spacer />
       <InputForm w="480px" h="500px" />
-      <Result w="480px" h="500px" tax={tax} />
+      <Result tax={tax} />
       <Spacer />
     </HStack>
   </VStack>
