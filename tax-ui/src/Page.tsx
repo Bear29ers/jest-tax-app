@@ -5,6 +5,7 @@ import { Heading, HStack, Spacer, VStack } from '@chakra-ui/react';
 
 import { FormInputs, InputForm } from './InputForm';
 import { Result } from './Result';
+import { CalcTaxParam, CalcTaxResult, useCalcTax } from './useCalcTax';
 
 // プロパティの型にコールバック関数を追加
 type PresentationProps = {
@@ -30,9 +31,28 @@ export const Page = () => {
   // TODO: APIからデータを取得する
   const [tax] = useState(10000);
 
+  // フックを使用してmutate関数を取得する
+  const { mutate } = useCalcTax();
+
   // フォームサブミット時に呼ばれるコールバック関数を定義
   const handleInputFormSubmit = (formInputs: FormInputs) => {
-    console.log(formInputs);
+    // フォームとAPIパラメータで方が異なるので変換
+    const param: CalcTaxParam = {
+      yearsOfService: Number(formInputs.yearsOfService),
+      isDisability: formInputs.isDisability,
+      isOfficer: !Number(formInputs.isOfficer),
+      severancePay: Number(formInputs.severancePay),
+    };
+
+    // APIを呼び出す
+    mutate(param, {
+      onSuccess: async (data) => {
+        if (data.ok) {
+          const json = (await data.json()) as CalcTaxResult;
+          console.log(json);
+        }
+      },
+    });
   };
 
   // Presentationコンポーネントを描画 & コールバック関数を渡す
