@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 
 import {
   Button,
@@ -23,21 +23,28 @@ import {
   VStack,
 } from '@chakra-ui/react';
 
-type FormInputs = {
+// ページコンポーネントから利用するのでexport
+export type FormInputs = {
   yearsOfService: string;
   isDisability: boolean;
   isOfficer: string;
   severancePay: string;
 };
 
-export const InputForm = ({ ...props }: CardProps) => {
+// プロパティ用の型
+type InputFormProps = CardProps & {
+  onInputFormSubmit: SubmitHandler<FormInputs>;
+};
+
+// コールバック関数をプロパティで受け取れるように変更
+export const InputForm = ({ onInputFormSubmit, ...props }: InputFormProps) => {
   // フォーム値の型を渡してRHFのuseFormフックを呼び出す
   const { register, handleSubmit } = useForm<FormInputs>();
 
   // フォームをサブミットしたとき呼び出されるコールバック関数を仮実装
-  const onInputFormSubmit = (formInputs: FormInputs) => {
-    console.log(formInputs);
-  };
+  // const onInputFormSubmit = (formInputs: FormInputs) => {
+  //   console.log(formInputs);
+  // };
 
   return (
     <Card w="400px">
