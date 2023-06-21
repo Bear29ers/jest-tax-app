@@ -27,7 +27,11 @@ describe('useCalcTax', () => {
     // テストケース内でMSWのハンドラをセットアップ
     server.use(
       rest.post('http://localhost:3000/calc-tax', async (req, res, ctx) => {
-        return res(ctx.status(200), ctx.json({ tax: 15315 }));
+        // return res(ctx.status(200), ctx.json({ tax: 15315 }));
+        return res(
+          ctx.status(400),
+          ctx.json({ message: 'Invalid parameter.' }),
+        );
       }),
     );
 
@@ -51,8 +55,13 @@ describe('useCalcTax', () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     // ステータスコードとレスポンスボディのJSONデータを確認
-    expect(result.current.data?.status).toBe(200);
-    expect(await result.current.data?.json()).toStrictEqual({ tax: 15315 });
+    expect(result.current.isError).toBe(false);
+    // expect(result.current.data?.status).toBe(200);
+    expect(result.current.data?.status).toBe(400);
+    // expect(await result.current.data?.json()).toStrictEqual({ tax: 15315 });
+    expect(await result.current.data?.json()).toStrictEqual({
+      message: 'Invalid parameter.',
+    });
 
     // キャプチャされたリクエストボディの内容を確認する
     const request = await pendingRequest;
