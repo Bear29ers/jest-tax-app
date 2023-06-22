@@ -218,3 +218,13 @@ describe('POST /calc-tax', () => {
     });
   });
 });
+
+describe('OPTIONS /calc-tax', () => {
+  test('フロントエンドのオリジンからのアクセスを許可する', async () => {
+    const res = await request(app).options('/calc-tax');
+    expect(res.status).toBe(204);
+    expect(res.headers['access-control-allow-origin']).toBe(
+      'http://localhost:3001',
+    );
+  });
+});
