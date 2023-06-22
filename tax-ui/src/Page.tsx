@@ -28,8 +28,8 @@ export const Presentation = ({ tax, onInputFormSubmit }: PresentationProps) => (
 );
 
 export const Page = () => {
-  // TODO: APIからデータを取得する
-  const [tax] = useState(10000);
+  // 計算結果を保持しておくState
+  const [tax, setTax] = useState<number | null>(null);
 
   // フックを使用してmutate関数を取得する
   const { mutate } = useCalcTax();
@@ -49,7 +49,8 @@ export const Page = () => {
       onSuccess: async (data) => {
         if (data.ok) {
           const json = (await data.json()) as CalcTaxResult;
-          console.log(json);
+          // 成功したら結果を更新
+          setTax(json.tax);
         }
       },
     });
