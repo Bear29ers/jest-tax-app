@@ -20,7 +20,7 @@ export const Presentation = ({ tax, onInputFormSubmit }: PresentationProps) => (
     <HStack w="100%">
       <Spacer />
       {/* コールバック関数を入力フォームコンポーネントに渡す */}
-      <InputForm w="480px" h="500px" onInputFormSubmit={onInputFormSubmit} />
+      <InputForm w="480px" h="550px" onInputFormSubmit={onInputFormSubmit} />
       <Result tax={tax} />
       <Spacer />
     </HStack>
