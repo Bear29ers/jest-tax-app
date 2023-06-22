@@ -33,7 +33,7 @@ const schema = z
     yearsOfService: z.number().int().gte(1).lte(100),
     isDisability: z.boolean(),
     isOfficer: z.string().transform((val) => !!Number(val)), // このプロパティだけバックエンドと定義が異なる
-    severancePay: z.number().int().gte(10).lte(1_000_000_000_000),
+    severancePay: z.number().int().gte(0).lte(1_000_000_000_000),
   })
   .strict();
 
