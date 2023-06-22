@@ -1,5 +1,8 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
 import {
   Button,
   Card,
@@ -9,6 +12,7 @@ import {
   Center,
   Checkbox,
   FormControl,
+  FormErrorMessage,
   FormHelperText,
   FormLabel,
   Heading,
@@ -23,13 +27,18 @@ import {
   VStack,
 } from '@chakra-ui/react';
 
-// ページコンポーネントから利用するのでexport
-export type FormInputs = {
-  yearsOfService: string;
-  isDisability: boolean;
-  isOfficer: string;
-  severancePay: string;
-};
+// Zodのスキーマ
+const schema = z
+  .object({
+    yearsOfService: z.number().int().gte(1).lte(100),
+    isDisability: z.boolean(),
+    isOfficer: z.string().transform((val) => !!Number(val)), // このプロパティだけバックエンドと定義が異なる
+    severancePay: z.number().int().gte(10).lte(1_000_000_000_000),
+  })
+  .strict();
+
+// フォーム値の型はZodから生成できる
+export type FormInputs = z.infer<typeof schema>;
 
 // プロパティ用の型
 type InputFormProps = CardProps & {
@@ -39,7 +48,17 @@ type InputFormProps = CardProps & {
 // コールバック関数をプロパティで受け取れるように変更
 export const InputForm = ({ onInputFormSubmit, ...props }: InputFormProps) => {
   // フォーム値の型を渡してRHFのuseFormフックを呼び出す
-  const { register, handleSubmit } = useForm<FormInputs>();
+  const {
+    register,
+    handleSubmit,
+    // バリデーションエラーの情報が格納される
+    formState: { errors },
+  } = useForm<FormInputs>({
+    // Zodでバリデーションを実行する
+    resolver: zodResolver(schema),
+    // ボタンを押したときではなく入力中にバリデーションを実行
+    mode: 'onChange',
+  });
 
   // フォームをサブミットしたとき呼び出されるコールバック関数を仮実装
   // const onInputFormSubmit = (formInputs: FormInputs) => {
@@ -57,9 +76,14 @@ export const InputForm = ({ onInputFormSubmit, ...props }: InputFormProps) => {
       </CardHeader>
       <CardBody>
         {/* サブミット時に呼び出されるコールバック関数を指定 */}
-        <form onSubmit={handleSubmit(onInputFormSubmit)}>
+        <form
+          onSubmit={handleSubmit(onInputFormSubmit)}
+          // RHFでバリデーションを実行するのでデフォルトのバリデーションをオフにする
+          noValidate
+        >
           <VStack spacing={5}>
-            <FormControl>
+            {/* isInvalidがtrueの場合エラー用の表示になる（Chakra UIの機能） */}
+            <FormControl isInvalid={!!errors.yearsOfService}>
               <FormLabel fontWeight="bold">勤続年数</FormLabel>
               <HStack>
                 <InputGroup w="120px">
@@ -67,12 +91,17 @@ export const InputForm = ({ onInputFormSubmit, ...props }: InputFormProps) => {
                     type="number"
                     defaultValue="10"
                     // フォームコンポーネントのRHFのコントロール下に置く
-                    {...register('yearsOfService')}
+                    // valueAsNumberによって数値としてZodに渡される（RHFの機能）
+                    {...register('yearsOfService', { valueAsNumber: true })}
                   />
                   <InputRightAddon>年</InputRightAddon>
                 </InputGroup>
                 <FormHelperText>1年未満の端数は切り上げ</FormHelperText>
               </HStack>
+              {/* FormControlのisInvalidがtrueの場合だけ表示される */}
+              <FormErrorMessage>
+                有効な勤続年数を入力してください
+              </FormErrorMessage>
               <Spacer />
             </FormControl>
             <FormControl>
@@ -94,16 +123,19 @@ export const InputForm = ({ onInputFormSubmit, ...props }: InputFormProps) => {
                 </Stack>
               </RadioGroup>
             </FormControl>
-            <FormControl>
+            <FormControl isInvalid={!!errors.severancePay}>
               <FormLabel fontWeight="bold">退職金</FormLabel>
               <InputGroup w="200px">
                 <Input
                   type="number"
                   defaultValue="5000000"
-                  {...register('severancePay')}
+                  {...register('severancePay', { valueAsNumber: true })}
                 />
                 <InputRightAddon>円</InputRightAddon>
               </InputGroup>
+              <FormErrorMessage>
+                有効な退職金を入力してください
+              </FormErrorMessage>
             </FormControl>
             <Button colorScheme="blue" alignSelf="flex-end" type="submit">
               所得税を計算する

@@ -37,15 +37,16 @@ export const Page = () => {
   // フォームサブミット時に呼ばれるコールバック関数を定義
   const handleInputFormSubmit = (formInputs: FormInputs) => {
     // フォームとAPIパラメータで方が異なるので変換
-    const param: CalcTaxParam = {
-      yearsOfService: Number(formInputs.yearsOfService),
-      isDisability: formInputs.isDisability,
-      isOfficer: !!Number(formInputs.isOfficer),
-      severancePay: Number(formInputs.severancePay),
-    };
+    // Zodが型を変換するので、この変換は不要
+    // const param: CalcTaxParam = {
+    //   yearsOfService: Number(formInputs.yearsOfService),
+    //   isDisability: formInputs.isDisability,
+    //   isOfficer: !!Number(formInputs.isOfficer),
+    //   severancePay: Number(formInputs.severancePay),
+    // };
 
     // APIを呼び出す
-    mutate(param, {
+    mutate(formInputs, {
       onSuccess: async (data) => {
         if (data.ok) {
           const json = (await data.json()) as CalcTaxResult;
