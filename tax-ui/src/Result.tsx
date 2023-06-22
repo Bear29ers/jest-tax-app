@@ -22,7 +22,7 @@ const noValueStr = '---';
 export const Result = ({ tax, ...props }: ResultProps) => {
   const taxStr = tax === null ? noValueStr : formatPrice(tax);
   return (
-    <Card w="480px" h="500px" {...props}>
+    <Card w="480px" h="550px" {...props}>
       <CardHeader>
         <Center>
           <Heading as="h3" size="md">
