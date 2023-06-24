@@ -3,25 +3,36 @@ import { SubmitHandler } from 'react-hook-form';
 
 import { Heading, HStack, Spacer, VStack } from '@chakra-ui/react';
 
+import { CalcStatus } from './calcStatus';
 import { FormInputs, InputForm } from './InputForm';
 import { Result } from './Result';
-import { CalcTaxParam, CalcTaxResult, useCalcTax } from './useCalcTax';
+import { CalcTaxResult, useCalcTax } from './useCalcTax';
 
 // プロパティの型にコールバック関数を追加
 type PresentationProps = {
   tax: number | null;
   onInputFormSubmit: SubmitHandler<FormInputs>;
+  calcStatus: CalcStatus;
 };
 
 // プロパティにコールバック関数を追加
-export const Presentation = ({ tax, onInputFormSubmit }: PresentationProps) => (
+export const Presentation = ({
+  tax,
+  onInputFormSubmit,
+  calcStatus,
+}: PresentationProps) => (
   <VStack marginY={5} spacing={5} w="100%" minW="800px">
     <Heading>退職金の所得税計算アプリケーション</Heading>
     <HStack w="100%">
       <Spacer />
       {/* コールバック関数を入力フォームコンポーネントに渡す */}
-      <InputForm w="480px" h="550px" onInputFormSubmit={onInputFormSubmit} />
-      <Result tax={tax} />
+      <InputForm
+        w="480px"
+        h="550px"
+        onInputFormSubmit={onInputFormSubmit}
+        calcStatus={calcStatus}
+      />
+      <Result tax={tax} calcStatus={calcStatus} />
       <Spacer />
     </HStack>
   </VStack>
@@ -58,5 +69,11 @@ export const Page = () => {
   };
 
   // Presentationコンポーネントを描画 & コールバック関数を渡す
-  return <Presentation tax={tax} onInputFormSubmit={handleInputFormSubmit} />;
+  return (
+    <Presentation
+      tax={tax}
+      onInputFormSubmit={handleInputFormSubmit}
+      calcStatus={'succeeded'}
+    />
+  );
 };

@@ -27,6 +27,8 @@ import {
   VStack,
 } from '@chakra-ui/react';
 
+import { CalcStatus } from './calcStatus';
+
 // Zodのスキーマ
 const schema = z
   .object({
@@ -43,10 +45,15 @@ export type FormInputs = z.infer<typeof schema>;
 // プロパティ用の型
 type InputFormProps = CardProps & {
   onInputFormSubmit: SubmitHandler<FormInputs>;
+  calcStatus: CalcStatus;
 };
 
 // コールバック関数をプロパティで受け取れるように変更
-export const InputForm = ({ onInputFormSubmit, ...props }: InputFormProps) => {
+export const InputForm = ({
+  onInputFormSubmit,
+  calcStatus,
+  ...props
+}: InputFormProps) => {
   // フォーム値の型を渡してRHFのuseFormフックを呼び出す
   const {
     register,

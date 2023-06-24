@@ -9,8 +9,11 @@ import {
   VStack,
 } from '@chakra-ui/react';
 
+import { CalcStatus } from './calcStatus';
+
 type ResultProps = {
   tax: number | null;
+  calcStatus: CalcStatus;
 };
 
 const formatPrice = (price: number): string => {
@@ -19,7 +22,7 @@ const formatPrice = (price: number): string => {
 
 const noValueStr = '---';
 
-export const Result = ({ tax, ...props }: ResultProps) => {
+export const Result = ({ tax, calcStatus, ...props }: ResultProps) => {
   const taxStr = tax === null ? noValueStr : formatPrice(tax);
   return (
     <Card w="480px" h="550px" {...props}>
