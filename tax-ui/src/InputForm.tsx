@@ -144,7 +144,12 @@ export const InputForm = ({
                 有効な退職金を入力してください
               </FormErrorMessage>
             </FormControl>
-            <Button colorScheme="blue" alignSelf="flex-end" type="submit">
+            <Button
+              colorScheme="blue"
+              alignSelf="flex-end"
+              type="submit"
+              isLoading={calcStatus === 'under-calculation'}
+            >
               所得税を計算する
             </Button>
           </VStack>
