@@ -10,7 +10,7 @@ import { CalcTaxResult, useCalcTax } from './useCalcTax';
 
 // プロパティの型にコールバック関数を追加
 type PresentationProps = {
-  tax: number | null;
+  tax: number;
   onInputFormSubmit: SubmitHandler<FormInputs>;
   calcStatus: CalcStatus;
 };
@@ -39,14 +39,8 @@ export const Presentation = ({
 );
 
 export const Page = () => {
-  // 計算状態から始まる
-  const [calcStatus, setCalcStatus] =
-    useState<CalcStatus>('before-calculation');
-  // 計算結果を保持しておくState
-  const [tax, setTax] = useState<number | null>(null);
-
   // フックを使用してmutate関数を取得する
-  const { mutate } = useCalcTax();
+  const { mutate, tax, calcStatus } = useCalcTax();
 
   // フォームサブミット時に呼ばれるコールバック関数を定義
   const handleInputFormSubmit = (formInputs: FormInputs) => {
@@ -59,30 +53,32 @@ export const Page = () => {
     //   severancePay: Number(formInputs.severancePay),
     // };
 
-    // サブミットすると計算中になる
-    setCalcStatus('under-calculation');
+    mutate(formInputs);
 
-    // APIを呼び出す
-    mutate(formInputs, {
-      onSuccess: async (data) => {
-        if (data.ok) {
-          const json = (await data.json()) as CalcTaxResult;
-          // 呼び出しに成功すると計算成功になる
-          setCalcStatus('succeeded');
-          // 成功したら結果を更新
-          setTax(json.tax);
-        } else {
-          // 200-299以外の場合は計算失敗
-          setCalcStatus('failed');
-          setTax(null);
-        }
-      },
-      onError: () => {
-        // エラーの場合も計算失敗
-        setCalcStatus('failed');
-        setTax(null);
-      },
-    });
+    // // サブミットすると計算中になる
+    // setCalcStatus('under-calculation');
+    //
+    // // APIを呼び出す
+    // mutate(formInputs, {
+    //   onSuccess: async (data) => {
+    //     if (data.ok) {
+    //       const json = (await data.json()) as CalcTaxResult;
+    //       // 呼び出しに成功すると計算成功になる
+    //       setCalcStatus('succeeded');
+    //       // 成功したら結果を更新
+    //       setTax(json.tax);
+    //     } else {
+    //       // 200-299以外の場合は計算失敗
+    //       setCalcStatus('failed');
+    //       setTax(0);
+    //     }
+    //   },
+    //   onError: () => {
+    //     // エラーの場合も計算失敗
+    //     setCalcStatus('failed');
+    //     setTax(0);
+    //   },
+    // });
   };
 
   // Presentationコンポーネントを描画 & コールバック関数を渡す

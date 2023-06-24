@@ -26,7 +26,7 @@ describe('useCalcTax', () => {
   test('所得税計算APIを呼び出せる', async () => {
     // テストケース内でMSWのハンドラをセットアップ
     server.use(
-      rest.post('http://localhost:3000/calc-tax', async (req, res, ctx) => {
+      rest.post('http://localhost:3000/calc-tax', async (_, res, ctx) => {
         // return res(ctx.status(200), ctx.json({ tax: 15315 }));
         return res(
           ctx.status(400),
