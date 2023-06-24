@@ -1,4 +1,9 @@
+import { useState } from 'react';
+
 import { useMutation } from '@tanstack/react-query';
+import { z } from 'zod';
+
+import { CalcStatus } from './calcStatus';
 
 const calcTaxUrl = 'http://localhost:3000/calc-tax';
 
@@ -9,17 +14,45 @@ export type CalcTaxParam = {
   severancePay: number;
 };
 
-export type CalcTaxResult = {
-  tax: number;
-};
+const schema = z.object({ tax: z.number() }).strict();
 
-export const useCalcTax = () =>
-  useMutation((param: CalcTaxParam) =>
-    fetch(calcTaxUrl, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
+export type CalcTaxResult = z.infer<typeof schema>;
+
+export const useCalcTax = () => {
+  const [tax, setTax] = useState(0);
+
+  const [calcStatus, setCalcStatus] =
+    useState<CalcStatus>('before-calculation');
+
+  const { mutate } = useMutation(
+    async (param: CalcTaxParam) => {
+      setCalcStatus('under-calculation');
+
+      const response = await fetch(calcTaxUrl, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(param),
+      });
+      if (!response.ok) {
+        throw new Error('Response is not ok');
+      }
+
+      const responseJson = await response.json();
+      return schema.parse({ ...responseJson });
+    },
+    {
+      onSuccess: (CalcTaxResult) => {
+        setCalcStatus('succeeded');
+        setTax(CalcTaxResult.tax);
       },
-      body: JSON.stringify(param),
-    }),
+      onError: () => {
+        setCalcStatus('failed');
+        setTax(0);
+      },
+    },
   );
+
+  return { mutate, tax, calcStatus };
+};
