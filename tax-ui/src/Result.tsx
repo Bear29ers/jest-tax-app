@@ -16,7 +16,7 @@ import {
 import { CalcStatus } from './calcStatus';
 
 type ResultProps = {
-  tax: number | null;
+  tax: number;
   calcStatus: CalcStatus;
 };
 
@@ -50,8 +50,10 @@ const FailedView = () => (
   </Alert>
 );
 
-const SucceededView = ({ tax }: { tax: number | null }) => {
-  const taxStr = formatPrice(tax ?? 0);
+const SucceededView = ({ tax }: { tax: number }) => {
+  // nullのチェックは不要
+  // const taxStr = formatPrice(tax ?? 0);
+  const taxStr = formatPrice(tax);
   return (
     <Box aria-label="tax">
       <Text as="span" fontSize="6xl">
@@ -69,7 +71,7 @@ const CalcStatusView = ({
   tax,
   calcStatus,
 }: {
-  tax: number | null;
+  tax: number;
   calcStatus: CalcStatus;
 }) => {
   switch (calcStatus) {

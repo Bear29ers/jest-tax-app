@@ -10,7 +10,7 @@ import { CalcTaxResult, useCalcTax } from './useCalcTax';
 
 // プロパティの型にコールバック関数を追加
 type PresentationProps = {
-  tax: number | null;
+  tax: number;
   onInputFormSubmit: SubmitHandler<FormInputs>;
   calcStatus: CalcStatus;
 };
@@ -43,7 +43,7 @@ export const Page = () => {
   const [calcStatus, setCalcStatus] =
     useState<CalcStatus>('before-calculation');
   // 計算結果を保持しておくState
-  const [tax, setTax] = useState<number | null>(null);
+  const [tax, setTax] = useState(0);
 
   // フックを使用してmutate関数を取得する
   const { mutate } = useCalcTax();
@@ -74,13 +74,13 @@ export const Page = () => {
         } else {
           // 200-299以外の場合は計算失敗
           setCalcStatus('failed');
-          setTax(null);
+          setTax(0);
         }
       },
       onError: () => {
         // エラーの場合も計算失敗
         setCalcStatus('failed');
-        setTax(null);
+        setTax(0);
       },
     });
   };
